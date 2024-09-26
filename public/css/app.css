@@ -1,0 +1,99 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #F4F6F8; /* Fundo muito claro */
+    line-height: 1.6; 
+}
+
+.navbar {
+    background-color: #4B3D5B; /* Roxo escuro */
+    border-bottom: 3px solid #5C6BC0; /* Azul suave */
+}
+
+.navbar-brand, .nav-link {
+    color: #FFFFFF !important; /* Texto branco */
+}
+
+.nav-link:hover {
+    color: #F4F6F8 !important; /* Texto claro ao passar o mouse */
+}
+
+footer {
+    background-color: #4B3D5B; /* Roxo escuro */
+    color: #FFFFFF; /* Texto branco */
+}
+
+.container-md {
+    background-color: #FFFFFF; /* Fundo branco */
+    border-radius: 12px; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+    padding: 30px; 
+    margin-top: 20px; 
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #212121; /* Texto escuro */
+    margin-bottom: 15px; 
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.table th {
+    background-color: #5C6BC0; /* Azul suave */
+    color: #FFFFFF; /* Texto branco */
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.alert {
+    border-radius: 5px; 
+}
+
+.alert-success {
+    background-color: rgba(92, 107, 192, 0.1); /* Azul suave */
+    border-color: #5C6BC0; /* Azul suave */
+}
+
+.alert-danger {
+    background-color: rgba(247, 211, 211, 0.9); 
+    border-color: #dc3545; 
+}
+
+table.dataTable thead {
+    background-color: #4B3D5B; /* Roxo escuro */
+    color: #FFFFFF; /* Texto branco */
+}
+
+table.dataTable tbody tr {
+    transition: background-color 0.3s;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: #eaeaea; /* Cinza claro ao passar o mouse */
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.5em 1em;
+    margin: 0 0.1em;
+    border-radius: 0.25em;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    color: white;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #BDBDBD; /* Borda cinza */
+    border-radius: 0.25em;
+    padding: 0.5em;
+    margin-bottom: 15px;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #BDBDBD; /* Borda cinza */
+    border-radius: 0.25em;
+    padding: 0.5em;
+}
