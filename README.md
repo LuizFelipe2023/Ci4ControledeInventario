@@ -14,6 +14,7 @@ Sistema para gerenciar itens de inventário usando PHP e CodeIgniter.
 - CodeIgniter
 - Bootstrap
 - JS Vanilla
+- Jquery (DataTables)
 
 ## Como Executar
 
