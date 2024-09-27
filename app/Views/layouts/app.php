@@ -31,6 +31,16 @@
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn" href="<?= site_url('clientes') ?>">
+                            <i class="bi bi-people"></i> Clientes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn" href="<?= site_url('clientes/create') ?>">
+                            <i class="bi bi-person"></i> Adicionar Cliente
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
