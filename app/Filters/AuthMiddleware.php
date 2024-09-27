@@ -13,7 +13,7 @@ class AuthMiddleware implements FilterInterface
        
         if (!session()->get('loggedIn')) {
           
-            return redirect()->to('/login')->with('error', 'Você precisa estar logado para acessar esta página.');
+            return redirect()->to('/')->with('error', 'Você precisa estar logado para acessar esta página.');
         }
     }
 

@@ -17,7 +17,7 @@
                         <div class="alert alert-danger"><?= session()->getFlashdata('error') ?></div>
                     <?php endif; ?>
 
-                    <form action="<?= site_url('inventario/update/' . $inventario['id']) ?>" method="post">
+                    <form action="<?= site_url('inventario/update/' . $inventario['id']) ?>" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="name" class="form-label">Nome do Item</label>
                             <input type="text" class="form-control" name="name" value="<?= esc($inventario['name']) ?>" required>
@@ -33,6 +33,10 @@
                         <div class="mb-3">
                             <label for="category" class="form-label">Categoria</label>
                             <input type="text" class="form-control" name="category" value="<?= esc($inventario['category']) ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imagem" class="form-label">Imagem do Item</label>
+                            <input type="file" class="form-control" name="imagem" id="imagem">
                         </div>
                         <button type="submit" class="btn btn-primary" style="background-color: #3a5b7d; border-color: #3a5b7d;">Atualizar Item</button>
                         <a href="<?= site_url('inventario') ?>" class="btn btn-outline-danger">Cancelar</a>

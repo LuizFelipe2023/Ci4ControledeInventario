@@ -51,7 +51,7 @@ class AuthController extends BaseController
             }
 
             log_message('info', 'Usuário criado com sucesso: ' . $data['email']);
-            return redirect()->to('/login')->with('message', 'Usuário criado com sucesso!');
+            return redirect()->to('/')->with('message', 'Usuário criado com sucesso!');
         } catch (Exception $e) {
             log_message('error', 'Erro ao criar o usuário: ' . $e->getMessage());
             return redirect()->back()->withInput()->with('error', 'Ocorreu um erro ao criar o usuário.');
@@ -108,6 +108,6 @@ class AuthController extends BaseController
     public function logout()
     {
         session()->destroy();
-        return redirect()->to('/login')->with('message', 'Você foi desconectado.');
+        return redirect()->to('/')->with('message', 'Você foi desconectado.');
     }
 }

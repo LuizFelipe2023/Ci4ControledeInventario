@@ -12,7 +12,7 @@ use Exception;
 
 class InventarioController extends BaseController
 {
-   
+
     public function index()
     {
         $inventario = new Inventario();
@@ -31,7 +31,6 @@ class InventarioController extends BaseController
     {
         try {
             $inventariosData = $this->request->getPost('inventarios');
-
             log_message('info', 'Dados recebidos: ' . json_encode($inventariosData));
 
             $inventarioModel = new Inventario();
@@ -40,7 +39,6 @@ class InventarioController extends BaseController
 
             foreach ($inventariosData as $index => $inventarioData) {
                 log_message('info', 'Processando item: ' . json_encode($inventarioData));
-
 
                 if (
                     empty($inventarioData['name']) ||
@@ -53,43 +51,35 @@ class InventarioController extends BaseController
                     continue;
                 }
 
-
                 if ((int)$inventarioData['quantity'] <= 0) {
                     $errors[] = 'A quantidade deve ser maior que zero para ' . esc($inventarioData['name']) . '.';
-                    log_message('error', 'Erro: ' . end($errors)); 
+                    log_message('error', 'Erro: ' . end($errors));
                     continue;
                 }
 
-
                 if ((float)$inventarioData['price'] < 0) {
                     $errors[] = 'O preço não pode ser negativo para ' . esc($inventarioData['name']) . '.';
-                    log_message('error', 'Erro: ' . end($errors)); 
+                    log_message('error', 'Erro: ' . end($errors));
                     continue;
                 }
 
                 $file = $this->request->getFile("inventarios.$index.imagem");
-                log_message('info', 'Arquivo recebido: ' . ($file ? $file->getName() : 'nenhum arquivo')); 
-                
                 $imagePath = null;
-                
+
                 if ($file && $file->isValid()) {
                     try {
-                        $originalFileName = $file->getClientName(); 
-                        $imagePath = $file->store('uploads', $originalFileName);
-                        log_message('info', 'Imagem armazenada em: ' . $imagePath);
+                        $newFileName = $file->getClientName();
+                        if ($file->move(FCPATH . 'uploads', $newFileName)) {
+                            $imagePath = 'uploads/' . $newFileName;  
+                            log_message('info', 'Imagem armazenada em: ' . $imagePath);
+                        } else {
+                            $errors[] = 'Erro ao mover o arquivo para uploads.';
+                        }
                     } catch (\CodeIgniter\Files\Exceptions\FileException $e) {
                         $errors[] = 'Erro ao enviar a imagem para o item ' . esc($inventarioData['name']) . ': ' . $e->getMessage();
                         log_message('error', 'Erro ao enviar a imagem para o item: ' . esc($inventarioData['name']) . ' - ' . $e->getMessage());
                     }
-                } else {
-                    $errors[] = 'Erro ao enviar a imagem para o item ' . esc($inventarioData['name']) . '.';
-                    log_message('error', 'Erro ao enviar a imagem para o item: ' . esc($inventarioData['name']));
                 }
-
-
-
-
-
 
                 $data = [
                     'name' => $inventarioData['name'],
@@ -98,7 +88,6 @@ class InventarioController extends BaseController
                     'category' => $inventarioData['category'],
                     'imagem' => $imagePath
                 ];
-
 
                 if ($inventarioModel->insert($data)) {
                     $successCount++;
@@ -109,17 +98,30 @@ class InventarioController extends BaseController
                 }
             }
 
-
             if ($successCount > 0) {
                 return redirect()->to('/inventario')->with('success', "$successCount inventários inseridos com sucesso!");
             }
 
             return redirect()->back()->with('error', implode(' ', $errors));
         } catch (\Exception $e) {
-            log_message('error', 'Exceção capturada: ' . $e->getMessage()); // Log da exceção
+            log_message('error', 'Exceção capturada: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Erro ao inserir os inventários.');
         }
     }
+
+    public function show($id)
+    {
+
+        $inventarioModel = new Inventario();
+        $inventario = $inventarioModel->find($id);
+
+        if (!$inventario) {
+            return redirect()->to('/inventario')->with('error', 'Item não encontrado.');
+        }
+
+        return view('inventario/show', ['inventario' => $inventario]);
+    }
+
 
 
 
@@ -140,22 +142,53 @@ class InventarioController extends BaseController
     {
         try {
             $inventarioModel = new Inventario();
-
+            $inventario = $inventarioModel->find($id);
+    
+            if (!$inventario) {
+                return redirect()->back()->with('error', 'Não foi encontrado o inventário');
+            }
+    
             $data = [
                 'name' => $this->request->getPost('name'),
                 'quantity' => (int)$this->request->getPost('quantity'),
                 'price' => (float)$this->request->getPost('price'),
-                'category' => $this->request->getPost('category')
+                'category' => $this->request->getPost('category'),
             ];
-
+    
+            $file = $this->request->getFile('imagem');
+            if ($file && $file->isValid()) {
+                try {
+                    if ($inventario['imagem']) {
+                        $oldImagePath = FCPATH . 'uploads/' . $inventario['imagem'];  // Update path
+                        if (file_exists($oldImagePath)) {
+                            unlink($oldImagePath);  
+                        }
+                    }
+    
+                    $newFileName = $file->getClientName();  
+                    if ($file->move(FCPATH . 'uploads', $newFileName)) {
+                        $data['imagem'] = 'uploads/' . $newFileName;  
+                        log_message('info', 'Nova imagem carregada: ' . $data['imagem']);
+                    } else {
+                        log_message('error', 'Erro ao mover o arquivo de imagem.');
+                        return redirect()->back()->with('error', 'Erro ao mover o arquivo de imagem.');
+                    }
+                } catch (\CodeIgniter\Files\Exceptions\FileException $e) {
+                    log_message('error', 'Erro ao enviar a nova imagem: ' . $e->getMessage());
+                    return redirect()->back()->with('error', 'Erro ao enviar a imagem: ' . $e->getMessage());
+                }
+            }
+            
             $inventarioModel->update($id, $data);
-
+    
             return redirect()->to('/inventario')->with('success', 'Inventário atualizado com sucesso!');
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
+        } catch (\Exception $e) {
+            log_message('error', 'Erro ao atualizar o inventário: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Erro ao atualizar o inventário: ' . $e->getMessage());
         }
     }
+
+
 
     public function deleteInventario($id)
     {

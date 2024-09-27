@@ -39,12 +39,12 @@
                                 <td><?= esc($i['id']) ?></td>
                                 <td><?= esc($i['name']) ?></td>
                                 <td><?= esc($i['quantity']) ?></td>
-                                <td>R$ <?= number_format(esc($i['price']), 2, ',', '.') ?></td> <!-- Format price -->
+                                <td>R$ <?= number_format(esc($i['price']), 2, ',', '.') ?></td> 
                                 <td><?= esc($i['category']) ?></td>
                                 <td>
                                     <a href="<?= site_url('inventario/edit/' . $i['id']) ?>" class="btn btn-warning btn-sm mb-2">Editar</a>
                                     <button type="button" class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= $i['id'] ?>">Excluir</button>
-                                    <a href="<?= site_url('inventario/' . $i['id']) ?>" class="btn btn-info btn-sm mb-2">Visualizar</a>
+                                    <a href="<?= site_url('inventario/show/'.$i['id']) ?>" class="btn btn-info btn-sm mb-2">Visualizar</a> 
                                 </td>
                             </tr>
                         <?php endforeach; ?>

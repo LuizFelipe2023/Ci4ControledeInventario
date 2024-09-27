@@ -51,7 +51,7 @@
                         </div>
                         
                         <button type="submit" class="btn btn-primary">Registrar</button>
-                        <a href="<?= site_url('/login') ?>" class="btn btn-outline-danger">Cancelar</a>
+                        <a href="<?= site_url('/') ?>" class="btn btn-outline-danger">Cancelar</a>
                     </form>
                 </div>
             </div>
