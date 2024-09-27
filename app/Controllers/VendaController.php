@@ -123,7 +123,7 @@ class VendaController extends BaseController
         $clienteModel = new Cliente();
     
         $venda = $vendaModel->find($id);
-        $inventarios = $inventarioModel->findAll();  // Corrigi para '$inventarios'
+        $inventarios = $inventarioModel->findAll();  
         $clientes = $clienteModel->findAll();
     
         if (!$venda) {
