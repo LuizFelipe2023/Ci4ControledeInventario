@@ -84,6 +84,7 @@
 <script>
     $(document).ready(function() {
         $('#inventarioTable').DataTable({
+            responsive: true,
             language: {
                 "lengthMenu": "Mostrar _MENU_ registros por página",
                 "zeroRecords": "Nenhum registro encontrado",

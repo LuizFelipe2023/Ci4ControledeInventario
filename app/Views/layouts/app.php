@@ -13,16 +13,16 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="<?= site_url('inventario') ?>">Controle de Inventário</a>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand btn" href="<?= site_url('inventario') ?>">Controle de Inventário</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= site_url('inventario/create') ?>">
+                        <a class="nav-link btn" href="<?= site_url('inventario/create') ?>">
                             <i class="bi bi-plus-circle"></i> Adicionar Item
                         </a>
                     </li>
@@ -36,7 +36,7 @@
         </div>
     </nav>
 
-    <main class="container-md my-4 flex-grow-1">
+    <main class="container-fluid my-4 flex-grow-1">
         <?= $this->renderSection('content') ?>
     </main>
 
