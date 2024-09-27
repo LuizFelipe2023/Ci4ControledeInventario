@@ -27,6 +27,16 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link btn" href="<?= site_url('vendas') ?>">
+                            <i class="bi bi-cart"></i> Vendas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn" href="<?= site_url('vendas/create') ?>">
+                            <i class="bi bi-cart-plus"></i> Inserir Venda
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="btn btn-danger nav-link" href="<?= site_url('logout') ?>">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>

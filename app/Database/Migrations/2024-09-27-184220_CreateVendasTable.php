@@ -17,6 +17,7 @@ class CreateVendasTable extends Migration
             'cliente_id'  => [
                 'type'       => 'INT',
                 'constraint' => 11,
+                'unsigned'   => true, 
             ],
             'valor_total' => [
                 'type'       => 'DECIMAL',
@@ -39,12 +40,12 @@ class CreateVendasTable extends Migration
 
         $this->forge->addForeignKey('cliente_id', 'clientes', 'id', 'CASCADE', 'CASCADE');
 
-        // Criar a tabela
         $this->forge->createTable('vendas');
     }
 
     public function down()
     {
+        $this->forge->dropForeignKey('vendas', 'vendas_cliente_id_foreign');
         $this->forge->dropTable('vendas');
     }
 }

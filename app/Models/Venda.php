@@ -30,16 +30,15 @@ class Venda extends Model
 
     // Validation
     protected $validationRules = [
-        'cliente_id'   => 'required|integer|exists:clientes,id', // O cliente deve ser um ID existente na tabela clientes
-        'valor_total'  => 'required|decimal|greater_than[0]', // O valor total deve ser um número decimal maior que zero
-        'data_venda'   => 'required|valid_date[Y-m-d H:i:s]', // A data da venda deve ser uma data válida
+        'cliente_id'   => 'required|integer|',
+        'valor_total'  => 'required|decimal|greater_than[0]', 
+        'data_venda'   => 'required|valid_date[Y-m-d H:i:s]', 
     ];
 
     protected $validationMessages = [
         'cliente_id' => [
             'required' => 'O campo Cliente é obrigatório.',
             'integer'  => 'O ID do cliente deve ser um número inteiro.',
-            'exists'   => 'O cliente informado não existe.',
         ],
         'valor_total' => [
             'required' => 'O campo Valor Total é obrigatório.',
@@ -65,4 +64,6 @@ class Venda extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    
 }
