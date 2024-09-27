@@ -41,7 +41,7 @@
                         </div>
 
                         <div id="itemsContainer">
-                            <?php foreach ($venda['itens'] as $index => $item): ?>
+                            <?php foreach (json_decode($venda['itens_vendidos'], true) as $index => $item): ?>
                                 <div class="item mb-3 border p-3 rounded">
                                     <div class="row">
                                         <div class="col-12 mb-2">
@@ -57,18 +57,19 @@
                                         </div>
                                         <div class="col-6 mb-2">
                                             <label for="quantity" class="form-label">Quantidade</label>
-                                            <input type="number" class="form-control" name="inventarios[<?= $index ?>][quantity]" value="<?= esc($item['quantidade']) ?>" required min="1">
+                                            <input type="number" class="form-control" name="inventarios[<?= $index ?>][quantity]" value="<?= esc($item['quantity']) ?>" required min="1">
                                         </div>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
 
-                        <p id="itemCount" class="text-muted">Total de itens: <?= count($venda['itens']) ?></p>
+                        <p id="itemCount" class="text-muted">Total de itens: <?= count(json_decode($venda['itens_vendidos'], true)) ?></p>
 
                         <button type="button" id="addItem" class="btn btn-primary mb-3">Adicionar Outro Item</button>
                         <button type="submit" class="btn btn-success mb-3">Salvar Alterações</button>
                         <a href="<?= site_url('vendas') ?>" class="btn btn-outline-danger mb-3">Cancelar</a>
+                        <input type="hidden" name="itens_vendidos" id="itensVendidos">
                     </form>
                 </div>
             </div>
@@ -79,37 +80,47 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-   document.addEventListener('DOMContentLoaded', function() {
-    let itemIndex = <?= count($venda['itens']) ?>;
+    document.addEventListener('DOMContentLoaded', function() {
+        let itemIndex = <?= count(json_decode($venda['itens_vendidos'], true)) ?>;
 
-    document.getElementById('addItem').addEventListener('click', function() {
-        const newItem = document.createElement('div');
-        newItem.className = 'item mb-3 border p-3 rounded';
-        newItem.innerHTML = `
-            <div class="row">
-                <div class="col-12 mb-2">
-                    <label for="inventory" class="form-label">Selecionar Item do Inventário</label>
-                    <select class="form-select" name="inventarios[${itemIndex}][id]" required>
-                        <option value="">Selecione um Item</option>
-                        <?php foreach ($inventarios as $inventario): ?>
-                            <option value="<?= esc($inventario['id']) ?>"><?= esc($inventario['name']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
+        document.getElementById('addItem').addEventListener('click', function() {
+            const newItem = document.createElement('div');
+            newItem.className = 'item mb-3 border p-3 rounded';
+            newItem.innerHTML = `
+                <div class="row">
+                    <div class="col-12 mb-2">
+                        <label for="inventory${itemIndex}" class="form-label">Selecionar Item do Inventário</label>
+                        <select class="form-select" name="inventarios[${itemIndex}][id]" required>
+                            <option value="">Selecione um Item</option>
+                            <?php foreach ($inventarios as $inventario): ?>
+                                <option value="<?= esc($inventario['id']) ?>"><?= esc($inventario['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-6 mb-2">
+                        <label for="quantity${itemIndex}" class="form-label">Quantidade</label>
+                        <input type="number" class="form-control" name="inventarios[${itemIndex}][quantity]" id="quantity${itemIndex}" required min="1">
+                    </div>
                 </div>
-                <div class="col-6 mb-2">
-                    <label for="quantity" class="form-label">Quantidade</label>
-                    <input type="number" class="form-control" name="inventarios[${itemIndex}][quantity]" required min="1">
-                </div>
-            </div>
-        `;
-        document.getElementById('itemsContainer').appendChild(newItem);
-        itemIndex++;
-        updateItemCount();
+            `;
+            document.getElementById('itemsContainer').appendChild(newItem);
+            itemIndex++;
+            updateItemCount();
+        });
+
+        function updateItemCount() {
+            document.getElementById('itemCount').textContent = `Total de itens: ${itemIndex}`;
+        }
+
+        document.getElementById('vendaForm').addEventListener('submit', function() {
+            const items = [];
+            document.querySelectorAll('#itemsContainer .item').forEach(function(item) {
+                const id = item.querySelector('select').value;
+                const quantity = item.querySelector('input').value;
+                items.push({ id, quantity });
+            });
+            document.getElementById('itensVendidos').value = JSON.stringify(items);
+        });
     });
-
-    function updateItemCount() {
-        document.getElementById('itemCount').textContent = `Total de itens: ${itemIndex}`;
-    }
-});
 </script>
 <?= $this->endSection() ?>

@@ -14,13 +14,18 @@ class VendaController extends BaseController
         $vendaModel = new Venda();
         $vendas = $vendaModel->orderBy('id', 'ASC')->findAll();
 
+        if (empty($vendas)) {
+            return view('vendas/dashboardVenda', ['vendas' => []]);
+        }
 
         $clienteIds = array_column($vendas, 'cliente_id');
 
+        if (empty($clienteIds)) {
+            throw new \Exception('No client IDs found in vendas');
+        }
 
         $clienteModel = new Cliente();
         $clientes = $clienteModel->whereIn('id', $clienteIds)->findAll();
-
 
         foreach ($vendas as &$venda) {
             foreach ($clientes as $cliente) {
@@ -33,6 +38,7 @@ class VendaController extends BaseController
 
         return view('vendas/dashboardVenda', ['vendas' => $vendas]);
     }
+
 
 
     public function createVendas()
@@ -115,17 +121,22 @@ class VendaController extends BaseController
         $vendaModel = new Venda();
         $inventarioModel = new Inventario();
         $clienteModel = new Cliente();
-
+    
         $venda = $vendaModel->find($id);
-        $itensInventario = $inventarioModel->findAll();
+        $inventarios = $inventarioModel->findAll();  // Corrigi para '$inventarios'
         $clientes = $clienteModel->findAll();
-
+    
         if (!$venda) {
             return redirect()->to('/vendas')->with('error', 'Venda não encontrada.');
         }
-
-        return view('vendas/editVenda', ['venda' => $venda, 'itensInventario' => $itensInventario, 'clientes' => $clientes]);
+    
+        return view('vendas/editVenda', [
+            'venda' => $venda,
+            'inventarios' => $inventarios,  
+            'clientes' => $clientes
+        ]);
     }
+    
 
     public function update($id)
     {
@@ -177,6 +188,7 @@ class VendaController extends BaseController
         $vendaModel->update($id, $data);
         return redirect()->to('/vendas')->with('success', 'Venda atualizada com sucesso!');
     }
+
 
     public function show($id)
     {

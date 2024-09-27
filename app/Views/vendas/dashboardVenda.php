@@ -41,8 +41,9 @@
                                 <td><?= esc((new DateTime($v['data_venda']))->format('d/m/Y')) ?></td> 
                                 <td>R$ <?= number_format($v['valor_total'], 2, ',', '.') ?></td>
                                 <td>
-                                    <button type="button" class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="<?= $v['id'] ?>">Excluir</button>
+                                    <button type="button" class="btn btn-danger btn-sm mb-2" data-bs-toggle="modal" data-id="<?= $v['id'] ?>">Excluir</button>
                                     <a href="<?= site_url('vendas/show/' . $v['id']) ?>" class="btn btn-info btn-sm mb-2">Visualizar</a>
+                                    <a href="<?= site_url('vendas/edit/' . $v['id']) ?>" class="btn btn-sm mb-2 btn-warning">Editar</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

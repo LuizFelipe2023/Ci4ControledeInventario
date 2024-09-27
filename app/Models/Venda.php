@@ -12,7 +12,7 @@ class Venda extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['cliente_id', 'valor_total', 'data_venda'];
+    protected $allowedFields    = ['cliente_id', 'valor_total', 'data_venda', 'itens_vendidos'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -64,6 +64,4 @@ class Venda extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    
 }

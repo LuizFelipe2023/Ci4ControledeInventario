@@ -19,6 +19,17 @@
                     <p class="card-text mt-2"><strong>Data da Venda:</strong> <?= esc(date('d/m/Y H:i:s', strtotime($venda['data_venda']))) ?></p>
                     <p class="card-text mt-2"><strong>Total da Venda:</strong> R$ <?= number_format(esc($venda['valor_total']), 2, ',', '.') ?></p>
                     
+                    <h5 class="card-title mt-4">Itens Vendidos</h5>
+                    <ul class="list-group">
+                        <?php foreach ($itensVendidos as $item): ?>
+                            <li class="list-group-item">
+                                <strong>Produto:</strong> <?= esc($item['name']) ?><br>
+                                <strong>Quantidade:</strong> <?= esc($item['quantity']) ?><br>
+                                <strong>Preço Unitário:</strong> R$ <?= number_format(esc($item['price']), 2, ',', '.') ?><br>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    
                     <a href="<?= site_url('vendas') ?>" class="btn btn-outline-secondary mt-4">Voltar para as Vendas</a>
                 </div>
             </div>

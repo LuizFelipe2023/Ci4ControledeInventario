@@ -63,6 +63,7 @@
                         <button type="button" id="addItem" class="btn btn-primary mb-3">Adicionar Outro Item</button>
                         <button type="submit" class="btn btn-success mb-3">Adicionar Venda</button>
                         <a href="<?= site_url('vendas') ?>" class="btn btn-outline-danger mb-3">Cancelar</a>
+                        <input type="hidden" name="itens_vendidos" id="itensVendidos">
                     </form>
                 </div>
             </div>
@@ -104,6 +105,16 @@
         function updateItemCount() {
             document.getElementById('itemCount').textContent = `Total de itens: ${itemIndex}`;
         }
+
+        document.getElementById('vendaForm').addEventListener('submit', function() {
+            const items = [];
+            document.querySelectorAll('#itemsContainer .item').forEach(function(item) {
+                const id = item.querySelector('select').value;
+                const quantity = item.querySelector('input').value;
+                items.push({ id, quantity });
+            });
+            document.getElementById('itensVendidos').value = JSON.stringify(items);
+        });
     });
 </script>
 <?= $this->endSection() ?>
