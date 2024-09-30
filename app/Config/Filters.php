@@ -2,6 +2,7 @@
 
 namespace Config;
 
+use App\Filters\CheckUser;
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
@@ -12,6 +13,7 @@ use CodeIgniter\Filters\InvalidChars;
 use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
+
 
 class Filters extends BaseFilters
 {
@@ -35,6 +37,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'auth'     => \App\Filters\AuthMiddleware::class,
+        'checkUser' => CheckUser::class,
     ];
 
     /**
