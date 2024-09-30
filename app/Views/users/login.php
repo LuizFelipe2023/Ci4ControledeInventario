@@ -38,8 +38,8 @@
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Entrar</button>
-                        <a href="<?= site_url('/register') ?>" class="btn btn-outline-danger">Criar Conta</a>
-                        <a href="<?= site_url('/request-reset-password') ?>" class="btn btn-outline-danger">Esqueceu a senha?</a>
+                        <a href="<?= site_url('/register') ?>" class="btn btn-success">Criar Conta</a>
+                        <a href="<?= site_url('/request-reset-password') ?>" class="btn btn-warning">Esqueceu a senha?</a>
                     </form>
                 </div>
             </div>

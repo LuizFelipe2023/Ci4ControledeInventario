@@ -155,16 +155,75 @@ class AuthController extends BaseController
         $emailService->setTo($email);
         $emailService->setSubject('Verificação de Email');
 
-        $emailBody = "<p>Clique no link abaixo para verificar seu email:</p>";
-        $emailBody .= "<p><a href='" . site_url('verify-token') . "'>Verificar Email</a></p>";
-        $emailBody .= "<p>Use o seguinte código de verificação:</p>";
-        $emailBody .= "<p><strong>" . esc(session()->get('verification_token')) . "</strong></p>";
+        $emailBody = '
+    <html>
+        <head>
+            <style>
+                .email-container {
+                    font-family: Arial, sans-serif;
+                    color: #333333;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                }
+                .email-header {
+                    background-color: #4CAF50;
+                    padding: 10px;
+                    text-align: center;
+                    color: white;
+                    font-size: 24px;
+                }
+                .email-content {
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    margin-top: 20px;
+                }
+                .email-button {
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    margin-top: 20px;
+                }
+                .email-footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #666666;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="email-header">
+                    Verificação de E-mail
+                </div>
+                <div class="email-content">
+                    <p>Olá,</p>
+                    <p>Por favor, clique no link abaixo para verificar seu e-mail:</p>
+                    <a href="' . site_url('verify-token') . '" class="email-button">Verificar E-mail</a>
+                    <p>Ou use o seguinte código de verificação:</p>
+                    <h2>' . esc(session()->get('verification_token')) . '</h2>
+                </div>
+                <div class="email-footer">
+                    <p>Se você não solicitou esta verificação, ignore este e-mail.</p>
+                    <p>&copy; 2024 Luiz Felipe Frois Neves</p>
+                </div>
+            </div>
+        </body>
+    </html>';
 
         $emailService->setMessage($emailBody);
         $emailService->setMailType('html');
 
         return $emailService->send();
     }
+
 
     public function verifyToken()
     {
@@ -237,16 +296,75 @@ class AuthController extends BaseController
         $emailService->setTo($email);
         $emailService->setSubject('Redefinição de Senha');
 
-        $emailBody = "<p>Clique no link abaixo para redefinir sua senha:</p>";
-        $emailBody .= "<p><a href='" . site_url('reset-password') . "'>Redefinir Senha</a></p>"; 
-        $emailBody .= "<p>Use o seguinte código de redefinição:</p>";
-        $emailBody .= "<p><strong>" . esc($token) . "</strong></p>";
+        $emailBody = '
+    <html>
+        <head>
+            <style>
+                .email-container {
+                    font-family: Arial, sans-serif;
+                    color: #333333;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                }
+                .email-header {
+                    background-color: #F44336;
+                    padding: 10px;
+                    text-align: center;
+                    color: white;
+                    font-size: 24px;
+                }
+                .email-content {
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    margin-top: 20px;
+                }
+                .email-button {
+                    background-color: #F44336;
+                    color: white;
+                    padding: 10px 20px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    margin-top: 20px;
+                }
+                .email-footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #666666;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="email-header">
+                    Redefinição de Senha
+                </div>
+                <div class="email-content">
+                    <p>Olá,</p>
+                    <p>Você solicitou a redefinição de sua senha. Clique no link abaixo para redefinir:</p>
+                    <a href="' . site_url('reset-password') . '" class="email-button">Redefinir Senha</a>
+                    <p>Ou use o seguinte código de redefinição:</p>
+                    <h2>' . esc($token) . '</h2>
+                </div>
+                <div class="email-footer">
+                    <p>Se você não solicitou esta alteração, ignore este e-mail.</p>
+                    <p>&copy; 2024 Luiz Felipe</p>
+                </div>
+            </div>
+        </body>
+    </html>';
 
         $emailService->setMessage($emailBody);
         $emailService->setMailType('html');
 
         return $emailService->send();
     }
+
 
 
     public function resetPassword()
@@ -268,7 +386,7 @@ class AuthController extends BaseController
         $userModel = new User();
         $user = $userModel->find($userId);
 
-    
+
         if (!$user || !password_verify($token, $user['resetToken'])) {
             return redirect()->back()->with('error', 'Token inválido ou expirado.');
         }
@@ -276,7 +394,7 @@ class AuthController extends BaseController
         $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
         $userModel->update($userId, [
             'password' => $hashedPassword,
-            'resetToken' => null 
+            'resetToken' => null
         ]);
 
         session()->remove('resetToken');
