@@ -39,14 +39,10 @@ class VendaController extends BaseController
         return view('vendas/dashboardVenda', ['vendas' => $vendas]);
     }
 
-
-
     public function createVendas()
     {
-
         $inventarioModel = new Inventario();
         $clienteModel = new Cliente();
-
 
         $clientes = $clienteModel->findAll();
         $itensInventario = $inventarioModel->findAll();
@@ -57,8 +53,6 @@ class VendaController extends BaseController
         ]);
     }
 
-
-
     public function storeVendas()
     {
         $vendasData = $this->request->getPost();
@@ -66,11 +60,15 @@ class VendaController extends BaseController
         $inventarioModel = new Inventario();
         $clienteModel = new Cliente();
 
+        // Log incoming data
+        log_message('info', 'Incoming Venda data: ' . json_encode($vendasData));
+
         $clienteId = $vendasData['cliente_id'];
         $itens = $vendasData['inventarios'];
         $valorTotal = 0;
 
         if (!$clienteModel->find($clienteId)) {
+            log_message('error', 'Cliente não encontrado: ' . $clienteId);
             return redirect()->back()->with('errors', ['Cliente não encontrado.']);
         }
 
@@ -85,6 +83,8 @@ class VendaController extends BaseController
                     $quantidade = $item['quantity'];
                     $valorTotal += $valorItem * $quantidade;
 
+                    // Log inventory update
+                    log_message('info', 'Updating inventory for item: ' . $item['id'] . ', quantity: ' . $quantidade);
                     $inventarioModel->update($item['id'], [
                         'quantity' => $itemData['quantity'] - $quantidade
                     ]);
@@ -96,8 +96,11 @@ class VendaController extends BaseController
                         'price' => $valorItem
                     ];
                 } else {
+                    log_message('error', 'Quantidade insuficiente para o item: ' . $itemData['name']);
                     return redirect()->back()->with('errors', ['Quantidade insuficiente para o item: ' . $itemData['name']]);
                 }
+            } else {
+                log_message('error', 'Item não encontrado: ' . $item['id']);
             }
         }
 
@@ -105,38 +108,39 @@ class VendaController extends BaseController
             'cliente_id' => $clienteId,
             'valor_total' => $valorTotal,
             'data_venda' => date('Y-m-d H:i:s'),
-            'itens_vendidos' => json_encode($itensVendidos)
+            'itens_vendidos' => json_encode($itensVendidos),
+            'forma_de_pagamento' => $this->request->getPost('forma_de_pagamento')
         ];
 
         if (!$vendaModel->save($data)) {
+            log_message('error', 'Erro ao registrar a venda: ' . json_encode($vendaModel->errors()));
             return redirect()->back()->with('errors', ['Erro ao registrar a venda.']);
         }
 
+        log_message('info', 'Venda registrada com sucesso: ' . json_encode($data));
         return redirect()->to('/vendas')->with('success', 'Vendas registradas com sucesso!');
     }
-
 
     public function edit($id)
     {
         $vendaModel = new Venda();
         $inventarioModel = new Inventario();
         $clienteModel = new Cliente();
-    
+
         $venda = $vendaModel->find($id);
-        $inventarios = $inventarioModel->findAll();  
+        $inventarios = $inventarioModel->findAll();
         $clientes = $clienteModel->findAll();
-    
+
         if (!$venda) {
             return redirect()->to('/vendas')->with('error', 'Venda não encontrada.');
         }
-    
+
         return view('vendas/editVenda', [
             'venda' => $venda,
-            'inventarios' => $inventarios,  
+            'inventarios' => $inventarios,
             'clientes' => $clientes
         ]);
     }
-    
 
     public function update($id)
     {
@@ -146,6 +150,7 @@ class VendaController extends BaseController
 
         $venda = $vendaModel->find($id);
         if (!$venda) {
+            log_message('error', 'Venda não encontrada: ' . $id);
             return redirect()->to('/vendas')->with('error', 'Venda não encontrada.');
         }
 
@@ -153,9 +158,11 @@ class VendaController extends BaseController
         $valorTotal = 0;
 
         if (!$clienteModel->find($vendasData['cliente_id'])) {
+            log_message('error', 'Cliente não encontrado: ' . $vendasData['cliente_id']);
             return redirect()->back()->with('errors', ['Cliente não encontrado.']);
         }
 
+        $formaDePagamento = $vendasData['forma_de_pagamento'];
         $itensVendidos = [];
 
         foreach ($vendasData['inventarios'] as $item) {
@@ -163,6 +170,7 @@ class VendaController extends BaseController
             $quantidade = $item['quantity'];
 
             if ($itemData) {
+                log_message('info', 'Updating inventory for item: ' . $item['id'] . ', quantity: ' . $quantidade);
                 $inventarioModel->update($item['id'], [
                     'quantity' => $itemData['quantity'] - $quantidade
                 ]);
@@ -175,6 +183,8 @@ class VendaController extends BaseController
                     'quantity' => $quantidade,
                     'price' => $itemData['price']
                 ];
+            } else {
+                log_message('error', 'Item não encontrado: ' . $item['id']);
             }
         }
 
@@ -182,13 +192,15 @@ class VendaController extends BaseController
             'cliente_id' => $vendasData['cliente_id'],
             'valor_total' => $valorTotal,
             'data_venda' => date('Y-m-d H:i:s'),
-            'itens_vendidos' => json_encode($itensVendidos)
+            'itens_vendidos' => json_encode($itensVendidos),
+            'forma_de_pagamento' => $formaDePagamento 
         ];
 
         $vendaModel->update($id, $data);
+        log_message('info', 'Venda atualizada com sucesso: ' . json_encode($data));
+
         return redirect()->to('/vendas')->with('success', 'Venda atualizada com sucesso!');
     }
-
 
     public function show($id)
     {
@@ -215,9 +227,6 @@ class VendaController extends BaseController
             'itensVendidos' => $itensVendidos
         ]);
     }
-
-
-
 
     public function delete($id)
     {

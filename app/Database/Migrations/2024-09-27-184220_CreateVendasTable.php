@@ -26,6 +26,10 @@ class CreateVendasTable extends Migration
             'data_venda'  => [
                 'type' => 'DATETIME',
             ],
+            'forma_de_pagamento'=> [  
+                'type' => 'VARCHAR',
+                'constraint' => 100,
+            ],
             'itens_vendidos' => [
                 'type' => 'TEXT',
                 'null' => true,

@@ -12,7 +12,7 @@ class Venda extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['cliente_id', 'valor_total', 'data_venda', 'itens_vendidos'];
+    protected $allowedFields    = ['cliente_id', 'valor_total', 'data_venda','forma_de_pagamento', 'itens_vendidos'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -33,6 +33,7 @@ class Venda extends Model
         'cliente_id'   => 'required|integer|',
         'valor_total'  => 'required|decimal|greater_than[0]', 
         'data_venda'   => 'required|valid_date[Y-m-d H:i:s]', 
+        'forma_de_pagamento' => 'required'
     ];
 
     protected $validationMessages = [
@@ -48,6 +49,9 @@ class Venda extends Model
         'data_venda' => [
             'required' => 'O campo Data da Venda é obrigatório.',
             'valid_date' => 'A Data da Venda deve estar no formato correto (Y-m-d H:i:s).',
+        ],
+        'forma_de_pagamento' => [
+            'required' => 'O método de pagamento é obrigatório.' 
         ],
     ];
 

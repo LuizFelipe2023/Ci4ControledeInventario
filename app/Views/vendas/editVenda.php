@@ -40,6 +40,17 @@
                             </select>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="forma_de_pagamento" class="form-label">Forma de Pagamento</label>
+                            <select class="form-select" name="forma_de_pagamento" required>
+                                <option value="">Selecione uma Forma de Pagamento</option>
+                                <option value="pix" <?= ($venda['forma_de_pagamento'] == 'pix') ? 'selected' : '' ?>>Pix</option>
+                                <option value="credito" <?= ($venda['forma_de_pagamento'] == 'credito') ? 'selected' : '' ?>>Crédito</option>
+                                <option value="debito" <?= ($venda['forma_de_pagamento'] == 'debito') ? 'selected' : '' ?>>Débito</option>
+                                <option value="vista" <?= ($venda['forma_de_pagamento'] == 'vista') ? 'selected' : '' ?>>À Vista</option>
+                            </select>
+                        </div>
+
                         <div id="itemsContainer">
                             <?php foreach (json_decode($venda['itens_vendidos'], true) as $index => $item): ?>
                                 <div class="item mb-3 border p-3 rounded">

@@ -37,6 +37,16 @@
                                 <?php endforeach; ?>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="forma_de_pagamento" class="form-label">Forma de Pagamento</label>
+                            <select class="form-select" name="forma_de_pagamento" id="forma_de_pagamento" required>
+                                <option value="">Selecione a Forma de Pagamento</option>
+                                <option value="pix">Pix</option>
+                                <option value="credito">Crédito</option>
+                                <option value="debito">Débito</option>
+                                <option value="avista">À Vista</option>
+                            </select>
+                        </div>
 
                         <div id="itemsContainer">
                             <div class="item mb-3 border p-3 rounded">
@@ -59,6 +69,8 @@
                         </div>
 
                         <p id="itemCount" class="text-muted">Total de itens: 1</p>
+
+                       
 
                         <button type="button" id="addItem" class="btn btn-primary mb-3">Adicionar Outro Item</button>
                         <button type="submit" class="btn btn-success mb-3">Adicionar Venda</button>
