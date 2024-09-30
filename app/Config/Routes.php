@@ -46,3 +46,9 @@ $routes->post('/send-verification-email', [AuthController::class, 'sendVerificat
 $routes->get('/verify-token', [AuthController::class, 'verifyToken']);
 $routes->post('/validate-token', [AuthController::class, 'validateToken']); 
 
+$routes->get('/request-reset-password', [AuthController::class, 'requestResetPassword']);
+$routes->post('/send-reset-token', [AuthController::class, 'sendResetToken']);
+$routes->get('/reset-password', [AuthController::class, 'resetPassword']);
+$routes->post('/update-password', [AuthController::class, 'updatePassword']);
+
+

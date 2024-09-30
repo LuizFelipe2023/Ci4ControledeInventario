@@ -193,9 +193,97 @@ class AuthController extends BaseController
         return redirect()->to('/')->with('error', 'Token inválido ou expirado.');
     }
 
+    public function requestResetPassword()
+    {
+        return view('users/request-reset-password');
+    }
+
+    public function sendResetToken()
+    {
+        $email = $this->request->getPost('email');
+        $userModel = new User();
+        $user = $userModel->where('email', $email)->first();
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'Email não encontrado.');
+        }
+
+        $token = strtoupper(substr(str_shuffle('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 6));
+        $hashedToken = password_hash($token, PASSWORD_DEFAULT);
 
 
+        if (!$userModel->update($user['id'], ['resetToken' => $hashedToken])) {
+            log_message('error', 'Erro ao atualizar o token para o usuário: ' . json_encode($user));
+            return redirect()->back()->with('error', 'Erro ao atualizar o token.');
+        }
 
+
+        session()->set('resetToken', $token);
+        session()->set('user_id', $user['id']);
+
+
+        if ($this->sendResetEmail($email, $token)) {
+            return redirect()->to('/')->with('message', 'Verificação enviada! Verifique seu email.');
+        }
+
+        log_message('error', 'Falha ao enviar o email de redefinição para: ' . $email);
+        return redirect()->back()->with('error', 'Falha ao enviar o email de redefinição.');
+    }
+
+    private function sendResetEmail($email, $token)
+    {
+        $emailService = \Config\Services::email();
+        $emailService->setFrom('felipinhoneves2011@gmail.com', 'Luiz Felipe');
+        $emailService->setTo($email);
+        $emailService->setSubject('Redefinição de Senha');
+
+        $emailBody = "<p>Clique no link abaixo para redefinir sua senha:</p>";
+        $emailBody .= "<p><a href='" . site_url('reset-password') . "'>Redefinir Senha</a></p>"; 
+        $emailBody .= "<p>Use o seguinte código de redefinição:</p>";
+        $emailBody .= "<p><strong>" . esc($token) . "</strong></p>";
+
+        $emailService->setMessage($emailBody);
+        $emailService->setMailType('html');
+
+        return $emailService->send();
+    }
+
+
+    public function resetPassword()
+    {
+        return view('users/reset-password');
+    }
+
+    public function updatePassword()
+    {
+        $token = $this->request->getPost('token');
+        $newPassword = $this->request->getPost('new_password');
+        $confirmPassword = $this->request->getPost('confirm_password');
+        $userId = session()->get('user_id');
+
+        if ($newPassword !== $confirmPassword) {
+            return redirect()->back()->withInput()->with('error', 'As senhas não correspondem.');
+        }
+
+        $userModel = new User();
+        $user = $userModel->find($userId);
+
+    
+        if (!$user || !password_verify($token, $user['resetToken'])) {
+            return redirect()->back()->with('error', 'Token inválido ou expirado.');
+        }
+
+        $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+        $userModel->update($userId, [
+            'password' => $hashedPassword,
+            'resetToken' => null 
+        ]);
+
+        session()->remove('resetToken');
+        session()->remove('user_id');
+
+        return redirect()->to('/')->with('message', 'Senha redefinida com sucesso!');
+    }
 
 
     public function logout()
