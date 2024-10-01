@@ -168,7 +168,7 @@ class AuthController extends BaseController
         $emailService->setTo($email);
         $emailService->setSubject('Código de Verificação de Dois Fatores');
 
-        // HTML email body
+       
         $emailBody = '
     <html>
         <head>
