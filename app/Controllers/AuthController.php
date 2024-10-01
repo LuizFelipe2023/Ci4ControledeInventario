@@ -27,7 +27,8 @@ class AuthController extends BaseController
                 'email' => $this->request->getPost('email'),
                 'password' => $this->request->getPost('password'),
                 'confirm_password' => $this->request->getPost('confirm_password'),
-                'isVerified' => 0
+                'isVerified' => 0,
+                'two_factor_enabled' => 1
             ];
 
             log_message('info', 'Dados recebidos para criação de usuário: ' . json_encode($data));
@@ -84,11 +85,8 @@ class AuthController extends BaseController
 
                 if ($user['isVerified'] == 0) {
                     log_message('warning', 'Usuário não verificado, redirecionando para a verificação de e-mail.');
-
                     return redirect()->to('/verify-email')->with('warning', 'Por favor, verifique seu e-mail antes de continuar.');
                 }
-
-                log_message('info', 'Configuring session for verified user.');
 
                 session()->set([
                     'user_id'   => $user['id'],
@@ -97,8 +95,24 @@ class AuthController extends BaseController
                     'loggedIn'  => true,
                 ]);
 
-                log_message('info', 'Sessão configurada: ' . json_encode(session()->get()));
+                if ($user['two_factor_enabled'] == 1) {
+                    $twoFactorCode = rand(100000, 999999);
+                    log_message('info', 'Preparando para atualizar two_factor_secret para o usuário ID: ' . $user['id']);
+                    log_message('info', 'Novo código de dois fatores: ' . $twoFactorCode);
 
+                    $userModel->update($user['id'], ['two_factor_secret' => $twoFactorCode]);
+
+                    if ($userModel->affectedRows() === 0) {
+                        log_message('error', 'Nenhum dado foi atualizado para o usuário ID: ' . $user['id']);
+                    }
+
+                    session()->set('two_factor_code', $twoFactorCode);
+                    $this->sendTwoFactorCodeEmail($user['email'], $twoFactorCode);
+
+                    return redirect()->to('/two-factor-auth')->with('message', 'Um código de verificação foi enviado para o seu e-mail.');
+                }
+
+                log_message('info', 'Login realizado com sucesso, redirecionando para o inventário.');
                 return redirect()->to('/inventario')->with('message', 'Login realizado com sucesso!');
             } else {
                 log_message('error', 'Falha na autenticação: Credenciais inválidas.');
@@ -109,6 +123,109 @@ class AuthController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Ocorreu um erro ao processar o login.');
         }
     }
+
+
+    public function form2FA()
+    {
+        return view('users/verify-two-factor');
+    }
+
+    public function verifyTwoFactor()
+    {
+        $userModel = new User();
+        $twoFactorCode = $this->request->getPost('two_factor_code');
+    
+        log_message('info', 'Verificando sessão: ' . json_encode(session()->get()));
+    
+        if (!session()->has('user_id')) {
+            log_message('error', 'ID do usuário não encontrado na sessão.');
+            return redirect()->to('/login')->with('error', 'Ocorreu um erro ao autenticar o 2FA.');
+        }
+    
+        $user = $userModel->find(session()->get('user_id'));
+    
+        if ($user && $user['two_factor_secret'] == $twoFactorCode) {
+            session()->set([
+                'user_id'   => $user['id'],
+                'user_name' => $user['name'],
+                'loggedIn' => true,
+                'isVerified' => $user['isVerified'],
+                'two_factor_authenticated' => true,
+            ]);
+    
+            log_message('info', '2FA autenticado com sucesso.');
+            return redirect()->to('/inventario')->with('message', 'Login realizado com sucesso!');
+        } else {
+            log_message('error', 'Código 2FA inválido.');
+            return redirect()->back()->withInput()->with('error', 'Código de verificação inválido.');
+        }
+    }
+    
+    private function sendTwoFactorCodeEmail($email, $twoFactorCode)
+    {
+        $emailService = \Config\Services::email();
+        $emailService->setFrom('felipinhoneves2011@gmail.com', 'Luiz Felipe Frois Neves');
+        $emailService->setTo($email);
+        $emailService->setSubject('Código de Verificação de Dois Fatores');
+
+        // HTML email body
+        $emailBody = '
+    <html>
+        <head>
+            <style>
+                .email-container {
+                    font-family: Arial, sans-serif;
+                    color: #333333;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                }
+                .email-header {
+                    background-color: #4CAF50;
+                    padding: 10px;
+                    text-align: center;
+                    color: white;
+                    font-size: 24px;
+                }
+                .email-content {
+                    background-color: white;
+                    padding: 20px;
+                    border-radius: 5px;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    margin-top: 20px;
+                }
+                .email-footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #666666;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="email-header">
+                    Código de Verificação de Dois Fatores
+                </div>
+                <div class="email-content">
+                    <p>Olá,</p>
+                    <p>Seu código de verificação para a autenticação de dois fatores é:</p>
+                    <h2>' . esc($twoFactorCode) . '</h2>
+                    <p>Por favor, insira este código na sua aplicação para continuar o processo de login.</p>
+                </div>
+                <div class="email-footer">
+                    <p>Se você não solicitou esta verificação, ignore este e-mail.</p>
+                    <p>&copy; 2024 Luiz Felipe Frois Neves</p>
+                </div>
+            </div>
+        </body>
+    </html>';
+
+        $emailService->setMessage($emailBody);
+        $emailService->setMailType('html');
+
+        return $emailService->send();
+    }
+
 
 
 
@@ -135,11 +252,9 @@ class AuthController extends BaseController
             return redirect()->back()->with('error', 'Erro ao atualizar o token.');
         }
 
-        // Store token in session
         session()->set('verification_token', $token);
         session()->set('user_id', $user['id']);
 
-        // Send email
         if ($this->sendEmail($email)) {
             return redirect()->to('/')->with('message', 'Verificação enviada! Verifique seu email.');
         }

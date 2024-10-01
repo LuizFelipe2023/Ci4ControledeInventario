@@ -12,7 +12,7 @@ class User extends Model
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['name','email','password','isVerified','token','resetToken'];
+    protected $allowedFields    = ['name','email','password','isVerified','token','resetToken','two_factor_secret'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
