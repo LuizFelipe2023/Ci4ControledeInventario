@@ -5,6 +5,7 @@ Sistema para gerenciar itens de inventário usando PHP e CodeIgniter.
 ## Funcionalidades
 
 - **Registro e Login:** Permite que usuários se registrem e façam login.
+- **Verificação de Email e Autenticação de 2 Fatores**: Uma camada extra de segurança ao autenticar os usuarios.
 - **Gerenciamento de Itens:** Adicione e visualize itens no inventário.
 - **Logout:** Saia da sua conta.
 
